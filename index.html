@@ -1,0 +1,165 @@
+<!DOCTYPE html> <html lang="tr"> <head>
+    <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Element Generator</title> <style>
+        /* body: Tüm sayfanın zeminini ve genel yazı tipini ayarlar */
+        body {
+            font-family: "Times New Roman", Times, serif; /* Eski klasik tırnaklı font */
+            font-size: 20px; /* Genel yazı büyüklüğü */
+            margin: 20px; /* Ekranın kenarlarından bırakılan boşluk */
+            background-color: #f9f9f9; /* Göz yormayan çok açık bir gri arka plan */
+            color: #000; /* Siyah yazı rengi */
+        }
+
+        /* class="input-group" olan kutuların altına biraz boşluk bırakıyoruz ki alt alta binerken yapışmasınlar */
+        .input-group {
+            margin-bottom: 5px;
+        }
+
+        /* Ekranda okuduğumuz "Number of elements:" gibi bilgilendirme yazılarının boyutu */
+        label {
+            font-size: 22px;
+        }
+
+        /* Sayı girdiğimiz kutunun tasarımı.
+           type="number" olan inputları seçtik. Bu sayede sadece sayı kutusu etkilenir. */
+        input[type="number"] {
+            font-size: 20px;
+            font-family: inherit; /* Yazı tipini sayfanınkiyle aynı yap (Times New Roman) */
+            padding: 2px; /* Kutunun içindeki yazının kenarlara olan iç boşluğu */
+            width: 250px; /* Kutunun genişliği */
+            border: 1px solid #000; /* Etrafına siyah ince bir çerçeve */
+        }
+
+        /* select: "Checkbox" veya "Radio" seçtiğimiz o açılır menünün (dropdown) tasarımı */
+        select {
+            font-size: 20px;
+            font-family: inherit;
+            padding: 2px;
+            border: 1px solid #000;
+        }
+
+        /* Ekleme (Add) butonu */
+        button#addBtn {
+            font-size: 20px;
+            font-family: inherit;
+            padding: 2px 15px; /* Üst/alttan 2 piksel, sağ/soldan 15 piksel iç boşluk (butonu şişmanlatır) */
+            margin-top: 5px; /* Üstündeki elemandan uzaklığı */
+            margin-bottom: 15px; /* Altındaki elemandan uzaklığı */
+            border: 1px solid #000;
+            background-color: #e0e0e0;
+            cursor: pointer; /* Üstüne gelince fare el işareti olsun */
+            display: block; /* Bu komut butonu bir 'tuğla' gibi yapar, yanına kimseyi almaz, alt satıra atar. */
+        }
+
+        /* Fare butonun üzerine gelince rengi biraz koyulaşsın */
+        button#addBtn:hover {
+            background-color: #cccccc;
+        }
+
+        /* Üretilen o küçük kutucukların ve sayıların döküleceği alan (#outputArea) */
+        #outputArea {
+            font-size: 22px;
+            display: flex; /* İçindekileri yan yana dizmek için en modern yöntemdir. */
+            flex-wrap: wrap; /* Eğer yan yana dizilen şeyler ekrana (sağ tarafa) sığmazsa, taşırmak yerine bir alt satıra indirir. */
+            align-items: center; /* Yan yana duran elemanları (kutucuk ve sayıyı) dikeyde tam ortalar. */
+            gap: 5px; /* Üretilen elemanların arasına 5 piksellik nefes alma boşluğu koyar. */
+        }
+
+        /* Üretilen checkbox veya radio tuşlarının bizzat kendisi */
+        #outputArea input {
+            margin: 0;
+            width: 18px; /* Kutucuklar biraz daha belirgin olsun diye boyut verdik */
+            height: 18px;
+            cursor: pointer; /* Tıklanabilir oldukları belli olsun */
+        }
+
+        /* Kutucukların yanındaki 0, 1, 2, 3 gibi sayıların tasarımı */
+        #outputArea label {
+            margin-right: 10px; /* Her sayının SAĞ tarafında boşluk bıraktık ki diğer kutucukla yapışmasın. */
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="input-group">
+        <label for="numElements">Number of elements:</label>
+        <input type="number" id="numElements" min="1">
+    </div>
+
+    <div class="input-group">
+        <label for="elementType">Type:</label>
+        <select id="elementType">
+            <option value="checkbox">Checkbox</option>
+            <option value="radio">Radio</option>
+        </select>
+    </div>
+
+    <button id="addBtn" onclick="generateElements()">Add</button>
+
+    <div id="outputArea"></div>
+
+    <script>
+        // Butona basınca bu fabrika (fonksiyon) çalışmaya başlar
+        function generateElements() {
+            
+            // 1. ADIM: MALZEMELERİ TOPLA
+            // Adam sayı kutusuna ne yazmış? Al ve 'numInput' cebine koy.
+            const numInput = document.getElementById('numElements').value;
+            // Adam açılır menüden ne seçmiş? (checkbox mu radio mu) Al ve 'typeInput' cebine koy.
+            const typeInput = document.getElementById('elementType').value;
+            // Ekrana dizeceğimiz boş tepsiyi bul.
+            const outputArea = document.getElementById('outputArea');
+            
+            // 2. ADIM: TEPSİYİ TEMİZLE
+            // Adam önce 5 yazıp Add'e bastı, sonra vazgeçip 10 yazıp Add'e bastıysa; 
+            // eski 5 tanenin yanına 10 tane daha eklemesin diye, işe başlamadan önce tepsinin içini (innerHTML) tamamen boşaltıyoruz ('').
+            outputArea.innerHTML = '';
+            
+            // 3. ADIM: SAYIYI KONTROL ET
+            // Adamın yazdığı yazıyı harbi bir matematik tam sayısına (Integer) çeviriyoruz.
+            const count = parseInt(numInput);
+            
+            // Eğer adam saçma sapan bir şey girdiyse (isNaN) veya sayı 0'dan küçük/eşitse...
+            if (isNaN(count) || count <= 0) {
+                return; // Hiçbir şey yapma, işlemi burada kesip çöpe at.
+            }
+
+            // 4. ADIM: ÜRETİM BANDI (DÖNGÜ)
+            // Fabrika bandı çalışmaya başlıyor. i sayısı 0'dan başlar. 
+            // Adamın girdiği sayıya (count) gelene kadar 1'er 1'er (i++) artarak döner.
+            // Örnek: Adam 13 girdiyse; i = 0, 1, 2... 12'ye kadar döner. 13'te durur (çünkü i < 13 dedik, i <= 13 demedik).
+            for (let i = 0; i < count; i++) {
+                
+                // Bantta yeni bir boş input (kutucuk) yaratıyoruz.
+                const inputEl = document.createElement('input');
+                
+                // Bu yarattığımız kutucuğun tipini, adamın menüden seçtiği şey yapıyoruz (checkbox veya radio).
+                inputEl.type = typeInput; 
+                
+                // ÇOK ÖNEMLİ BİR KURAL:
+                // Checkbox'larda (kare kutular) istediğin kadar seçeneği aynı anda tikleyebilirsin.
+                // Ama Radio'larda (yuvarlak noktalar) test çözer gibi sadece BİR tanesini seçebilirsin. 
+                // Radio'ların bu "sadece bir tane seçilme" kuralının çalışması için hepsinin AYNI GRUPTA (aynı isme sahip) olması gerekir.
+                if (typeInput === 'radio') {
+                    // Eğer üretilen şey radio ise, hepsine aynı ismi ('generatedRadios') yapıştırıyoruz ki birini seçince diğeri sönsün.
+                    inputEl.name = 'generatedRadios';
+                }
+
+                // Şimdi kutucuğun yanına yazılacak sayıyı (0, 1, 2...) yaratıyoruz. 
+                // Bunun için bir 'label' (etiket) üretiyoruz.
+                const labelEl = document.createElement('label');
+                labelEl.textContent = i; // Etiketin içine o anki fabrika bandı sırasını (0, 1, 2...) yazdırıyoruz.
+                
+                // 5. ADIM: TEPSİYE DİZ
+                // Önce yarattığımız kutucuğu boş tepsiye koyuyoruz.
+                outputArea.appendChild(inputEl);
+                // Sonra hemen yanına da o sayıyı (label) koyuyoruz.
+                outputArea.appendChild(labelEl);
+
+                // Bant bir sonraki tur için tekrar başa dönüyor, ta ki istenen sayıya ulaşana kadar.
+            }
+        }
+    </script>
+</body>
+</html>
